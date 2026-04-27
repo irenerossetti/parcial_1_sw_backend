@@ -24,6 +24,8 @@ public class PoliticaNegocio {
     private String empresaId;       // A qué empresa/organización pertenece
 
     private List<Nodo> flujo;       // Lista de pasos/nodos del diagrama
+    
+    private List<CampoFormulario> campos; // Campos dinámicos del formulario
 
     private TipoFlujo tipoFlujo;   // Qué tipo de flujo es
 

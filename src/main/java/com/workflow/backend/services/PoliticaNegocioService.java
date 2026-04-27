@@ -7,6 +7,7 @@ import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -18,6 +19,10 @@ public class PoliticaNegocioService {
         return politicaRepository.findByActivoTrue();
     }
 
+    public Optional<PoliticaNegocio> obtenerPorIdOptional(String id) {
+        return politicaRepository.findById(id);
+    }
+
     public PoliticaNegocio crear(PoliticaNegocio politica) {
         politica.setCreadoEn(LocalDateTime.now());
         politica.setActualizadoEn(LocalDateTime.now());
@@ -27,5 +32,14 @@ public class PoliticaNegocioService {
     public PoliticaNegocio obtenerPorId(String id) {
         return politicaRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Política no encontrada"));
+    }
+
+    public PoliticaNegocio actualizar(PoliticaNegocio politica) {
+        politica.setActualizadoEn(LocalDateTime.now());
+        return politicaRepository.save(politica);
+    }
+
+    public void eliminar(String id) {
+        politicaRepository.deleteById(id);
     }
 }

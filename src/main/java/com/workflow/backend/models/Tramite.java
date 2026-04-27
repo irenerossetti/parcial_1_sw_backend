@@ -1,74 +1,135 @@
 package com.workflow.backend.models;
 
-import lombok.Data;
-import lombok.NoArgsConstructor;
-import lombok.AllArgsConstructor;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
-
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-@Data
-@NoArgsConstructor
-@AllArgsConstructor
 @Document(collection = "tramites")
 public class Tramite {
 
     @Id
     private String id;
-
-    private String codigo;           // Código legible: Ej: "TRM-2026-0001"
-
-    private String clienteId;        // Usuario que inició el trámite
-    private String politicaId;       // Qué política de negocio sigue
-
-    private EstadoTramite estado;    // Estado general del trámite
-
-    private String nodoActualId;     // En qué paso del flujo está AHORA
-
-    private List<HistorialPaso> historial; // Todo lo que ha pasado
-
-    private Map<String, Object> datosFormulario; // Datos ingresados por dptos
-
-    private LocalDateTime creadoEn = LocalDateTime.now();
-    private LocalDateTime actualizadoEn = LocalDateTime.now();
+    private String codigo;
+    private String clienteId;
+    private String clienteEmail;  // ← AGREGAR ESTE CAMPO
+    private String clienteNombre;
+    private String politicaId;
+    private EstadoTramite estado;
+    private String nodoActualId;
+    private List<HistorialPaso> historial;
+    private Map<String, Object> datosFormulario;
+    private LocalDateTime creadoEn;
+    private LocalDateTime actualizadoEn;
     private LocalDateTime finalizadoEn;
+    private String departamentoActual;  // ← MOVER AQUÍ, DENTRO DE LA CLASE
 
-    // ── Estado general del trámite ───────────────────────────────
+    // Enums internos
     public enum EstadoTramite {
-        NUEVO,          // Etiqueta ROJA  - Recién llegó
-        EN_PROCESO,     // Etiqueta AMARILLA - En ejecución
-        COMPLETADO,     // Etiqueta VERDE - Finalizado
-        RECHAZADO,      // Fue denegado
-        PAUSADO         // En espera de algo
+        NUEVO,
+        EN_PROCESO,
+        COMPLETADO,
+        RECHAZADO,
+        PENDIENTE,      // ← AGREGAR
+        EN_MORA,
     }
 
-    // ── Registro de cada paso que se completó ───────────────────
-    @Data
-    @NoArgsConstructor
-    @AllArgsConstructor
+    // Clase interna para historial de pasos
     public static class HistorialPaso {
-
         private String nodoId;
         private String nombreNodo;
         private String departamentoId;
-        private String funcionarioId;    // Quién lo procesó
-
+        private String funcionarioId;
+        private String comentario;
+        private Map<String, Object> datosIngresados;
         private EstadoPaso estado;
-
-        private String comentario;       // Notas del funcionario
-        private Map<String, Object> datosIngresados; // Formulario llenado
-
         private LocalDateTime iniciadoEn;
         private LocalDateTime completadoEn;
 
         public enum EstadoPaso {
             PENDIENTE,
-            EN_PROCESO,
             COMPLETADO,
             RECHAZADO
         }
+
+        // Getters y Setters
+        public String getNodoId() { return nodoId; }
+        public void setNodoId(String nodoId) { this.nodoId = nodoId; }
+
+        public String getNombreNodo() { return nombreNodo; }
+        public void setNombreNodo(String nombreNodo) { this.nombreNodo = nombreNodo; }
+
+        public String getDepartamentoId() { return departamentoId; }
+        public void setDepartamentoId(String departamentoId) { this.departamentoId = departamentoId; }
+
+        public String getFuncionarioId() { return funcionarioId; }
+        public void setFuncionarioId(String funcionarioId) { this.funcionarioId = funcionarioId; }
+
+        public String getComentario() { return comentario; }
+        public void setComentario(String comentario) { this.comentario = comentario; }
+
+        public Map<String, Object> getDatosIngresados() { return datosIngresados; }
+        public void setDatosIngresados(Map<String, Object> datosIngresados) { this.datosIngresados = datosIngresados; }
+
+        public EstadoPaso getEstado() { return estado; }
+        public void setEstado(EstadoPaso estado) { this.estado = estado; }
+
+        public LocalDateTime getIniciadoEn() { return iniciadoEn; }
+        public void setIniciadoEn(LocalDateTime iniciadoEn) { this.iniciadoEn = iniciadoEn; }
+
+        public LocalDateTime getCompletadoEn() { return completadoEn; }
+        public void setCompletadoEn(LocalDateTime completadoEn) { this.completadoEn = completadoEn; }
     }
+
+    // Constructores
+    public Tramite() {
+        this.historial = new ArrayList<>();
+        this.datosFormulario = new HashMap<>();
+    }
+
+    // Getters y Setters
+    public String getId() { return id; }
+    public void setId(String id) { this.id = id; }
+
+    public String getCodigo() { return codigo; }
+    public void setCodigo(String codigo) { this.codigo = codigo; }
+
+    public String getClienteId() { return clienteId; }
+    public void setClienteId(String clienteId) { this.clienteId = clienteId; }
+
+    public String getClienteEmail() { return clienteEmail; }  // ← AGREGAR
+    public void setClienteEmail(String clienteEmail) { this.clienteEmail = clienteEmail; }  // ← AGREGAR
+
+    public String getClienteNombre() { return clienteNombre; }  // ← AGREGAR
+    public void setClienteNombre(String clienteNombre) { this.clienteNombre = clienteNombre; }  // ← AGREGAR
+
+    public String getPoliticaId() { return politicaId; }
+    public void setPoliticaId(String politicaId) { this.politicaId = politicaId; }
+
+    public EstadoTramite getEstado() { return estado; }
+    public void setEstado(EstadoTramite estado) { this.estado = estado; }
+
+    public String getNodoActualId() { return nodoActualId; }
+    public void setNodoActualId(String nodoActualId) { this.nodoActualId = nodoActualId; }
+
+    public List<HistorialPaso> getHistorial() { return historial; }
+    public void setHistorial(List<HistorialPaso> historial) { this.historial = historial; }
+
+    public Map<String, Object> getDatosFormulario() { return datosFormulario; }
+    public void setDatosFormulario(Map<String, Object> datosFormulario) { this.datosFormulario = datosFormulario; }
+
+    public LocalDateTime getCreadoEn() { return creadoEn; }
+    public void setCreadoEn(LocalDateTime creadoEn) { this.creadoEn = creadoEn; }
+
+    public LocalDateTime getActualizadoEn() { return actualizadoEn; }
+    public void setActualizadoEn(LocalDateTime actualizadoEn) { this.actualizadoEn = actualizadoEn; }
+
+    public LocalDateTime getFinalizadoEn() { return finalizadoEn; }
+    public void setFinalizadoEn(LocalDateTime finalizadoEn) { this.finalizadoEn = finalizadoEn; }
+
+    public String getDepartamentoActual() { return departamentoActual; }
+    public void setDepartamentoActual(String departamentoActual) { this.departamentoActual = departamentoActual; }
 }

@@ -8,4 +8,6 @@ import java.util.List;
 @Repository
 public interface PoliticaNegocioRepository extends MongoRepository<PoliticaNegocio, String> {
     List<PoliticaNegocio> findByActivoTrue();
+    long countByActivoTrue();
+    boolean existsByNombre(String nombre);
 }

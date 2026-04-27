@@ -11,7 +11,7 @@ import java.util.List;
 @RestController
 @RequestMapping("/api/politicas")
 @RequiredArgsConstructor
-@CrossOrigin(origins = "*")
+@CrossOrigin(origins = "http://localhost:4200")
 public class PoliticaNegocioController {
 
     private final PoliticaNegocioService politicaService;
@@ -23,11 +23,32 @@ public class PoliticaNegocioController {
 
     @PostMapping
     public ResponseEntity<PoliticaNegocio> crear(@RequestBody PoliticaNegocio politica) {
-        return ResponseEntity.ok(politicaService.crear(politica));
+        return ResponseEntity.status(201).body(politicaService.crear(politica));
     }
 
     @GetMapping("/{id}")
     public ResponseEntity<PoliticaNegocio> obtenerPorId(@PathVariable String id) {
-        return ResponseEntity.ok(politicaService.obtenerPorId(id));
+        return politicaService.obtenerPorIdOptional(id)
+                .map(ResponseEntity::ok)
+                .orElseGet(() -> ResponseEntity.notFound().build());
+    }
+
+    @PutMapping("/{id}")
+    public ResponseEntity<PoliticaNegocio> actualizar(@PathVariable String id, @RequestBody PoliticaNegocio politica) {
+        return politicaService.obtenerPorIdOptional(id)
+                .map(existente -> {
+                    politica.setId(id);
+                    return ResponseEntity.ok(politicaService.actualizar(politica));
+                })
+                .orElseGet(() -> ResponseEntity.notFound().build());
+    }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Void> eliminar(@PathVariable String id) {
+        if (politicaService.obtenerPorIdOptional(id).isPresent()) {
+            politicaService.eliminar(id);
+            return ResponseEntity.noContent().build();
+        }
+        return ResponseEntity.notFound().build();
     }
 }

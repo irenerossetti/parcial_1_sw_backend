@@ -2,52 +2,57 @@ package com.workflow.backend.services;
 
 import com.workflow.backend.models.Usuario;
 import com.workflow.backend.repositories.UsuarioRepository;
-import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.Optional;
 
 @Service
-@RequiredArgsConstructor   // Lombok: inyecta dependencias automáticamente
 public class UsuarioService {
 
-    private final UsuarioRepository usuarioRepository;
+    @Autowired
+    private UsuarioRepository usuarioRepository;
 
-    // Obtener todos los usuarios
-    public List<Usuario> obtenerTodos() {
+    @Autowired
+    private PasswordEncoder passwordEncoder;
+
+    public List<Usuario> getAllUsuarios() {
         return usuarioRepository.findAll();
     }
 
-    // Obtener usuario por ID
-    public Optional<Usuario> obtenerPorId(String id) {
+    public Optional<Usuario> getUsuarioById(String id) {
         return usuarioRepository.findById(id);
     }
 
-    // Crear nuevo usuario
-    public Usuario crear(Usuario usuario) {
-        if (usuarioRepository.existsByEmail(usuario.getEmail())) {
-            throw new RuntimeException("Ya existe un usuario con ese email");
-        }
+    public Optional<Usuario> getUsuarioByEmail(String email) {
+        return usuarioRepository.findByEmail(email);
+    }
+
+    public Usuario createUsuario(Usuario usuario) {
         return usuarioRepository.save(usuario);
     }
 
-    // Actualizar usuario
-    public Usuario actualizar(String id, Usuario usuarioActualizado) {
-        return usuarioRepository.findById(id).map(usuario -> {
-            usuario.setNombre(usuarioActualizado.getNombre());
-            usuario.setApellido(usuarioActualizado.getApellido());
-            usuario.setRol(usuarioActualizado.getRol());
-            usuario.setDepartamentoId(usuarioActualizado.getDepartamentoId());
+    public Usuario updateUsuario(String id, Usuario usuarioDetails) {
+        Optional<Usuario> usuarioOpt = usuarioRepository.findById(id);
+        if (usuarioOpt.isPresent()) {
+            Usuario usuario = usuarioOpt.get();
+            usuario.setNombre(usuarioDetails.getNombre());
+            usuario.setEmail(usuarioDetails.getEmail());
+            usuario.setRol(usuarioDetails.getRol());
+            usuario.setDepartamentoNombre(usuarioDetails.getDepartamentoNombre());
+            usuario.setActivo(usuarioDetails.isActivo());
+            // Solo actualizar contraseña si se proporciona una nueva
+            if (usuarioDetails.getPassword() != null && !usuarioDetails.getPassword().isEmpty()) {
+                usuario.setPassword(passwordEncoder.encode(usuarioDetails.getPassword()));
+            }
             return usuarioRepository.save(usuario);
-        }).orElseThrow(() -> new RuntimeException("Usuario no encontrado"));
+        }
+        return null;
     }
 
-    // Desactivar usuario (no eliminamos, solo desactivamos)
-    public void desactivar(String id) {
-        usuarioRepository.findById(id).ifPresent(usuario -> {
-            usuario.setActivo(false);
-            usuarioRepository.save(usuario);
-        });
+    public void deleteUsuario(String id) {
+        usuarioRepository.deleteById(id);
     }
 }
