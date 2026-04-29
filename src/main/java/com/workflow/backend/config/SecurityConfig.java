@@ -4,11 +4,13 @@ import com.workflow.backend.security.JwtAuthenticationFilter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.core.annotation.Order;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
+import org.springframework.security.config.annotation.web.configuration.WebSecurityCustomizer;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -30,9 +32,13 @@ public class SecurityConfig {
     private JwtAuthenticationFilter jwtAuthenticationFilter;
 
     @Bean
+    public WebSecurityCustomizer webSecurityCustomizer() {
+        return (web) -> web.ignoring().requestMatchers("/api/kpis/**");
+    }
+
+    @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         System.out.println("=== CONFIGURANDO SECURITY FILTER CHAIN ===");
-        System.out.println("Permitiendo /api/kpis/** para ADMIN y FUNCIONARIO");
         
         http
                 .csrf(csrf -> csrf.disable())
@@ -40,32 +46,21 @@ public class SecurityConfig {
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(auth -> auth
                         // Endpoints públicos
-                        .requestMatchers("/api/auth/login").permitAll()
-                        .requestMatchers("/api/auth/register").permitAll()
+                        .requestMatchers("/api/auth/**").permitAll()
                         // Endpoints de trámites
-                        .requestMatchers("/api/tramites").hasAnyRole("ADMIN", "FUNCIONARIO", "CLIENTE")
-                        .requestMatchers("/api/tramites/mis-tramites").hasAnyRole("ADMIN", "FUNCIONARIO", "CLIENTE")
-                        .requestMatchers("/api/tramites/*/pdf").hasAnyRole("ADMIN", "FUNCIONARIO", "CLIENTE")
-                        .requestMatchers("/api/tramites/*/estado-completo").hasAnyRole("ADMIN", "FUNCIONARIO")
-                        .requestMatchers("/api/tramites/*/avanzar").hasAnyRole("ADMIN", "FUNCIONARIO")
-                        .requestMatchers("/api/tramites/*/rechazar").hasAnyRole("ADMIN", "FUNCIONARIO")
+                        .requestMatchers("/api/tramites/**").hasAnyRole("ADMIN", "FUNCIONARIO", "CLIENTE")
                         // Endpoints de notificaciones
                         .requestMatchers("/api/notificaciones/**").hasAnyRole("ADMIN", "FUNCIONARIO", "CLIENTE")
-                        // Endpoints de KPIs (ADMIN y FUNCIONARIO)
-                        .requestMatchers("/api/kpis/**").hasAnyRole("ADMIN", "FUNCIONARIO")
-                        // Endpoints de KPIs (ADMIN y FUNCIONARIO) - DEBE IR ANTES DE POLITICAS
-                        .requestMatchers("/api/kpis/**").hasAnyRole("ADMIN", "FUNCIONARIO")
                         // Endpoints de politicas
-                        .requestMatchers("/api/politicas").hasAnyRole("ADMIN", "FUNCIONARIO", "CLIENTE")
                         .requestMatchers(HttpMethod.POST, "/api/politicas").hasRole("ADMIN")
                         .requestMatchers(HttpMethod.PUT, "/api/politicas/**").hasRole("ADMIN")
                         .requestMatchers(HttpMethod.DELETE, "/api/politicas/**").hasRole("ADMIN")
-                        .requestMatchers(HttpMethod.GET, "/api/politicas/**").hasAnyRole("ADMIN", "FUNCIONARIO", "CLIENTE")
+                        .requestMatchers("/api/politicas/**").hasAnyRole("ADMIN", "FUNCIONARIO", "CLIENTE")
                         // Endpoints de departamentos
-                        .requestMatchers("/api/departamentos").hasAnyRole("ADMIN", "FUNCIONARIO")
+                        .requestMatchers("/api/departamentos/**").hasAnyRole("ADMIN", "FUNCIONARIO")
                         // Endpoints de usuarios (solo ADMIN)
                         .requestMatchers("/api/usuarios/**").hasRole("ADMIN")
-                        // Endpoints de formularios (ADMIN y FUNCIONARIO)
+                        // Endpoints de formularios
                         .requestMatchers("/api/formularios/**").hasAnyRole("ADMIN", "FUNCIONARIO", "CLIENTE")
                         // Cualquier otra cosa requiere autenticación
                         .anyRequest().authenticated()

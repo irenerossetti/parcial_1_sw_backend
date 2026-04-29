@@ -13,7 +13,6 @@ import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/api/kpis")
-@CrossOrigin(origins = "*")
 public class KPIController {
 
     @Autowired
@@ -27,6 +26,30 @@ public class KPIController {
         Map<String, Object> response = new HashMap<>();
         response.put("message", "KPI Controller está funcionando - VERSION 2.0");
         response.put("timestamp", LocalDateTime.now().toString());
+        return ResponseEntity.ok(response);
+    }
+
+    /**
+     * Endpoint para verificar autenticación y roles del usuario actual
+     */
+    @GetMapping("/verificar-auth")
+    public ResponseEntity<?> verificarAuth() {
+        Map<String, Object> response = new HashMap<>();
+        
+        // Obtener el usuario autenticado
+        org.springframework.security.core.Authentication authentication = 
+            org.springframework.security.core.context.SecurityContextHolder.getContext().getAuthentication();
+        
+        if (authentication != null && authentication.isAuthenticated()) {
+            response.put("autenticado", true);
+            response.put("username", authentication.getName());
+            response.put("authorities", authentication.getAuthorities().toString());
+            response.put("principal", authentication.getPrincipal().toString());
+        } else {
+            response.put("autenticado", false);
+            response.put("mensaje", "No hay usuario autenticado");
+        }
+        
         return ResponseEntity.ok(response);
     }
 

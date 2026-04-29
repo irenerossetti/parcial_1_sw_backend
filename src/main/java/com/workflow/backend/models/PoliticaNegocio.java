@@ -103,19 +103,7 @@ public class PoliticaNegocio {
             PARALELA,       // <<parallel>>
             STREAM          // <<stream>>
         }
-    }
-    
-    // ── Posición del nodo en el canvas ──────────────────────────
-    @Data
-    @NoArgsConstructor
-    @AllArgsConstructor
-    public static class PosicionNodo {
-        private double x;
-        private double y;
-        private double ancho;  // Opcional, para nodos con tamaño variable
-        private double alto;   // Opcional
-    }
-
+        
         public enum TipoNodo {
             // Nodos básicos
             INICIO,              // Nodo inicial (círculo negro)
@@ -143,4 +131,16 @@ public class PoliticaNegocio {
             INTERRUPCION         // Región interrumpible (rectángulo con esquinas redondeadas y borde discontinuo)
         }
     }
+    
+    // ── Posición del nodo en el canvas ──────────────────────────
+    @Data
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class PosicionNodo {
+        private double x;
+        private double y;
+        private double ancho;  // Opcional, para nodos con tamaño variable
+        private double alto;   // Opcional
+    }
+
 }

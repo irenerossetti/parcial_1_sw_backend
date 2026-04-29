@@ -31,3 +31,9 @@ build/
 
 ### VS Code ###
 .vscode/
+
+### Archivos de documentación temporal ###
+*.md
+!README.md
+*.txt
+*.bat
