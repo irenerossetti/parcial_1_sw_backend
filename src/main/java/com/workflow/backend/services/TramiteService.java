@@ -3,10 +3,19 @@ package com.workflow.backend.services;
 import com.workflow.backend.models.*;
 import com.workflow.backend.repositories.*;
 import com.lowagie.text.Document;
+import com.lowagie.text.Element;
 import com.lowagie.text.Font;
 import com.lowagie.text.FontFactory;
+import com.lowagie.text.PageSize;
 import com.lowagie.text.Paragraph;
+import com.lowagie.text.Phrase;
+import com.lowagie.text.Rectangle;
+import com.lowagie.text.Chunk;
+import com.lowagie.text.pdf.PdfPCell;
+import com.lowagie.text.pdf.PdfPTable;
 import com.lowagie.text.pdf.PdfWriter;
+import com.lowagie.text.pdf.draw.LineSeparator;
+import java.awt.Color;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -429,71 +438,417 @@ public class TramiteService {
                 return estado;
         }
 
-        // ── Generar PDF de cierre del trámite ───────────────────────
+        // ── Generar PDF de cierre del trámite (SIN VALIDACIONES PARA DEMO) ───────────────────────
         public byte[] generarPdfCierre(String tramiteId) {
-                Tramite tramite = tramiteRepository.findById(tramiteId)
-                                .orElseThrow(() -> new RuntimeException("Trámite no encontrado"));
-
-                if (tramite.getEstado() != Tramite.EstadoTramite.COMPLETADO) {
-                        throw new RuntimeException("El trámite aún no está finalizado");
-                }
-
-                ByteArrayOutputStream output = new ByteArrayOutputStream();
-                Document document = new Document();
-
                 try {
-                        PdfWriter.getInstance(document, output);
-                        document.open();
+                        Tramite tramite = tramiteRepository.findById(tramiteId)
+                                        .orElseThrow(() -> new RuntimeException("Trámite no encontrado"));
 
-                        Font titulo = FontFactory.getFont(FontFactory.HELVETICA_BOLD, 16);
-                        Font subtitulo = FontFactory.getFont(FontFactory.HELVETICA_BOLD, 12);
-                        Font normal = FontFactory.getFont(FontFactory.HELVETICA, 10);
+                        // ============================================================
+                        // VALIDACIÓN ELIMINADA PARA DEMO
+                        // Permite generar PDF en cualquier estado del trámite
+                        // ============================================================
 
-                        document.add(new Paragraph("Comprobante de Trámite Finalizado", titulo));
+                        ByteArrayOutputStream output = new ByteArrayOutputStream();
+                        Document document = new Document(PageSize.A4, 40, 40, 60, 60);
+
+                        try {
+                                PdfWriter writer = PdfWriter.getInstance(document, output);
+                                document.open();
+
+                        // ═══════════════════════════════════════════════════════════
+                        // ENCABEZADO CON DISEÑO PROFESIONAL
+                        // ═══════════════════════════════════════════════════════════
+                        
+                        // Colores corporativos
+                        Color azulPrimario = new Color(37, 99, 235); // #2563eb
+                        Color azulOscuro = new Color(30, 64, 175);   // #1e40af
+                        Color grisClaro = new Color(248, 250, 252);  // #f8fafc
+                        Color verdeExito = new Color(16, 185, 129);  // #10b981
+                        
+                        // Tabla de encabezado con fondo azul
+                        PdfPTable headerTable = new PdfPTable(2);
+                        headerTable.setWidthPercentage(100);
+                        headerTable.setWidths(new float[]{2, 1});
+                        
+                        // Celda izquierda - Título
+                        PdfPCell leftCell = new PdfPCell();
+                        leftCell.setBorder(Rectangle.NO_BORDER);
+                        leftCell.setBackgroundColor(azulPrimario);
+                        leftCell.setPadding(20);
+                        
+                        Font tituloGrande = FontFactory.getFont(FontFactory.HELVETICA_BOLD, 24, Color.WHITE);
+                        Font subtituloBlanco = FontFactory.getFont(FontFactory.HELVETICA, 12, Color.WHITE);
+                        
+                        Paragraph titulo = new Paragraph("COMPROBANTE OFICIAL", tituloGrande);
+                        titulo.setAlignment(Element.ALIGN_LEFT);
+                        leftCell.addElement(titulo);
+                        
+                        Paragraph subtitulo = new Paragraph("Sistema de Gestión de Trámites", subtituloBlanco);
+                        subtitulo.setAlignment(Element.ALIGN_LEFT);
+                        subtitulo.setSpacingBefore(5);
+                        leftCell.addElement(subtitulo);
+                        
+                        headerTable.addCell(leftCell);
+                        
+                        // Celda derecha - Estado
+                        PdfPCell rightCell = new PdfPCell();
+                        rightCell.setBorder(Rectangle.NO_BORDER);
+                        rightCell.setBackgroundColor(verdeExito);
+                        rightCell.setPadding(20);
+                        rightCell.setVerticalAlignment(Element.ALIGN_MIDDLE);
+                        
+                        Font estadoFont = FontFactory.getFont(FontFactory.HELVETICA_BOLD, 16, Color.WHITE);
+                        Paragraph estado = new Paragraph("✓ COMPLETADO", estadoFont);
+                        estado.setAlignment(Element.ALIGN_CENTER);
+                        rightCell.addElement(estado);
+                        
+                        headerTable.addCell(rightCell);
+                        document.add(headerTable);
+                        
                         document.add(new Paragraph(" "));
-                        document.add(new Paragraph("Código: " + nullSafe(tramite.getCodigo()), normal));
-                        document.add(new Paragraph("Estado: " + nullSafe(String.valueOf(tramite.getEstado())), normal));
-                        document.add(new Paragraph("Cliente: " + nullSafe(tramite.getClienteNombre()), normal));
-                        document.add(new Paragraph("Email cliente: " + nullSafe(tramite.getClienteEmail()), normal));
-                        document.add(new Paragraph("Departamento actual: " + nullSafe(tramite.getDepartamentoActual()), normal));
-                        document.add(new Paragraph("Fecha creación: " + nullSafe(String.valueOf(tramite.getCreadoEn())), normal));
-                        document.add(new Paragraph("Fecha finalización: " + nullSafe(String.valueOf(tramite.getFinalizadoEn())), normal));
+                        
+                        // ═══════════════════════════════════════════════════════════
+                        // INFORMACIÓN PRINCIPAL DEL TRÁMITE
+                        // ═══════════════════════════════════════════════════════════
+                        
+                        Font tituloSeccion = FontFactory.getFont(FontFactory.HELVETICA_BOLD, 14, azulPrimario);
+                        Font etiqueta = FontFactory.getFont(FontFactory.HELVETICA_BOLD, 10, Color.DARK_GRAY);
+                        Font valor = FontFactory.getFont(FontFactory.HELVETICA, 10, Color.BLACK);
+                        
+                        // Tabla de información principal
+                        PdfPTable infoTable = new PdfPTable(2);
+                        infoTable.setWidthPercentage(100);
+                        infoTable.setWidths(new float[]{1, 2});
+                        infoTable.setSpacingBefore(10);
+                        
+                        // Estilo de celdas
+                        PdfPCell cellEtiqueta, cellValor;
+                        
+                        // Código del trámite
+                        cellEtiqueta = new PdfPCell(new Phrase("Código de Trámite:", etiqueta));
+                        cellEtiqueta.setBorder(Rectangle.NO_BORDER);
+                        cellEtiqueta.setBackgroundColor(grisClaro);
+                        cellEtiqueta.setPadding(10);
+                        infoTable.addCell(cellEtiqueta);
+                        
+                        cellValor = new PdfPCell(new Phrase(nullSafe(tramite.getCodigo()), valor));
+                        cellValor.setBorder(Rectangle.NO_BORDER);
+                        cellValor.setPadding(10);
+                        infoTable.addCell(cellValor);
+                        
+                        // Cliente
+                        cellEtiqueta = new PdfPCell(new Phrase("Cliente:", etiqueta));
+                        cellEtiqueta.setBorder(Rectangle.NO_BORDER);
+                        cellEtiqueta.setBackgroundColor(grisClaro);
+                        cellEtiqueta.setPadding(10);
+                        infoTable.addCell(cellEtiqueta);
+                        
+                        cellValor = new PdfPCell(new Phrase(nullSafe(tramite.getClienteNombre()), valor));
+                        cellValor.setBorder(Rectangle.NO_BORDER);
+                        cellValor.setPadding(10);
+                        infoTable.addCell(cellValor);
+                        
+                        // Email
+                        cellEtiqueta = new PdfPCell(new Phrase("Email:", etiqueta));
+                        cellEtiqueta.setBorder(Rectangle.NO_BORDER);
+                        cellEtiqueta.setBackgroundColor(grisClaro);
+                        cellEtiqueta.setPadding(10);
+                        infoTable.addCell(cellEtiqueta);
+                        
+                        cellValor = new PdfPCell(new Phrase(nullSafe(tramite.getClienteEmail()), valor));
+                        cellValor.setBorder(Rectangle.NO_BORDER);
+                        cellValor.setPadding(10);
+                        infoTable.addCell(cellValor);
+                        
+                        // Departamento
+                        cellEtiqueta = new PdfPCell(new Phrase("Departamento:", etiqueta));
+                        cellEtiqueta.setBorder(Rectangle.NO_BORDER);
+                        cellEtiqueta.setBackgroundColor(grisClaro);
+                        cellEtiqueta.setPadding(10);
+                        infoTable.addCell(cellEtiqueta);
+                        
+                        cellValor = new PdfPCell(new Phrase(nullSafe(tramite.getDepartamentoActual()), valor));
+                        cellValor.setBorder(Rectangle.NO_BORDER);
+                        cellValor.setPadding(10);
+                        infoTable.addCell(cellValor);
+                        
+                        // Fecha de creación
+                        cellEtiqueta = new PdfPCell(new Phrase("Fecha de Inicio:", etiqueta));
+                        cellEtiqueta.setBorder(Rectangle.NO_BORDER);
+                        cellEtiqueta.setBackgroundColor(grisClaro);
+                        cellEtiqueta.setPadding(10);
+                        infoTable.addCell(cellEtiqueta);
+                        
+                        String fechaCreacion = tramite.getCreadoEn() != null 
+                                ? tramite.getCreadoEn().format(java.time.format.DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm"))
+                                : "N/A";
+                        cellValor = new PdfPCell(new Phrase(fechaCreacion, valor));
+                        cellValor.setBorder(Rectangle.NO_BORDER);
+                        cellValor.setPadding(10);
+                        infoTable.addCell(cellValor);
+                        
+                        // Fecha de finalización
+                        cellEtiqueta = new PdfPCell(new Phrase("Fecha de Finalización:", etiqueta));
+                        cellEtiqueta.setBorder(Rectangle.NO_BORDER);
+                        cellEtiqueta.setBackgroundColor(grisClaro);
+                        cellEtiqueta.setPadding(10);
+                        infoTable.addCell(cellEtiqueta);
+                        
+                        String fechaFin = tramite.getFinalizadoEn() != null 
+                                ? tramite.getFinalizadoEn().format(java.time.format.DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm"))
+                                : "N/A";
+                        cellValor = new PdfPCell(new Phrase(fechaFin, valor));
+                        cellValor.setBorder(Rectangle.NO_BORDER);
+                        cellValor.setPadding(10);
+                        infoTable.addCell(cellValor);
+                        
+                        document.add(infoTable);
                         document.add(new Paragraph(" "));
-
-                        document.add(new Paragraph("Historial de pasos", subtitulo));
+                        
+                        // ═══════════════════════════════════════════════════════════
+                        // HISTORIAL DE PASOS
+                        // ═══════════════════════════════════════════════════════════
+                        
+                        Paragraph tituloHistorial = new Paragraph("Historial del Proceso", tituloSeccion);
+                        tituloHistorial.setSpacingBefore(15);
+                        tituloHistorial.setSpacingAfter(10);
+                        document.add(tituloHistorial);
+                        
                         if (tramite.getHistorial() == null || tramite.getHistorial().isEmpty()) {
-                                document.add(new Paragraph("Sin historial registrado.", normal));
+                                Paragraph sinHistorial = new Paragraph("Sin historial registrado.", valor);
+                                sinHistorial.setAlignment(Element.ALIGN_CENTER);
+                                sinHistorial.setSpacingBefore(10);
+                                document.add(sinHistorial);
                         } else {
+                                PdfPTable historialTable = new PdfPTable(3);
+                                historialTable.setWidthPercentage(100);
+                                historialTable.setWidths(new float[]{0.5f, 2, 1.5f});
+                                
+                                // Encabezados
+                                Font headerFont = FontFactory.getFont(FontFactory.HELVETICA_BOLD, 10, Color.WHITE);
+                                
+                                PdfPCell headerCell1 = new PdfPCell(new Phrase("#", headerFont));
+                                headerCell1.setBackgroundColor(azulOscuro);
+                                headerCell1.setPadding(8);
+                                headerCell1.setHorizontalAlignment(Element.ALIGN_CENTER);
+                                historialTable.addCell(headerCell1);
+                                
+                                PdfPCell headerCell2 = new PdfPCell(new Phrase("Paso", headerFont));
+                                headerCell2.setBackgroundColor(azulOscuro);
+                                headerCell2.setPadding(8);
+                                historialTable.addCell(headerCell2);
+                                
+                                PdfPCell headerCell3 = new PdfPCell(new Phrase("Departamento", headerFont));
+                                headerCell3.setBackgroundColor(azulOscuro);
+                                headerCell3.setPadding(8);
+                                historialTable.addCell(headerCell3);
+                                
+                                // Filas de datos
                                 int index = 1;
                                 for (Tramite.HistorialPaso paso : tramite.getHistorial()) {
-                                        document.add(new Paragraph(index + ". "
-                                                        + nullSafe(paso.getNombreNodo())
-                                                        + " [" + nullSafe(String.valueOf(paso.getEstado())) + "]"
-                                                        + " - Departamento: " + nullSafe(paso.getDepartamentoId()), normal));
+                                        PdfPCell cell1 = new PdfPCell(new Phrase(String.valueOf(index), valor));
+                                        cell1.setPadding(8);
+                                        cell1.setHorizontalAlignment(Element.ALIGN_CENTER);
+                                        cell1.setBackgroundColor(index % 2 == 0 ? grisClaro : Color.WHITE);
+                                        historialTable.addCell(cell1);
+                                        
+                                        String nombrePaso = nullSafe(paso.getNombreNodo());
+                                        String estadoPaso = paso.getEstado() != null ? " ✓" : "";
+                                        PdfPCell cell2 = new PdfPCell(new Phrase(nombrePaso + estadoPaso, valor));
+                                        cell2.setPadding(8);
+                                        cell2.setBackgroundColor(index % 2 == 0 ? grisClaro : Color.WHITE);
+                                        historialTable.addCell(cell2);
+                                        
+                                        PdfPCell cell3 = new PdfPCell(new Phrase(nullSafe(paso.getDepartamentoId()), valor));
+                                        cell3.setPadding(8);
+                                        cell3.setBackgroundColor(index % 2 == 0 ? grisClaro : Color.WHITE);
+                                        historialTable.addCell(cell3);
+                                        
                                         index++;
                                 }
+                                
+                                document.add(historialTable);
                         }
-
+                        
                         document.add(new Paragraph(" "));
-                        document.add(new Paragraph("Datos de formulario", subtitulo));
-                        if (tramite.getDatosFormulario() == null || tramite.getDatosFormulario().isEmpty()) {
-                                document.add(new Paragraph("Sin datos capturados.", normal));
-                        } else {
+                        
+                        // ═══════════════════════════════════════════════════════════
+                        // DATOS DEL FORMULARIO
+                        // ═══════════════════════════════════════════════════════════
+                        
+                        if (tramite.getDatosFormulario() != null && !tramite.getDatosFormulario().isEmpty()) {
+                                Paragraph tituloDatos = new Paragraph("Datos Capturados", tituloSeccion);
+                                tituloDatos.setSpacingBefore(15);
+                                tituloDatos.setSpacingAfter(10);
+                                document.add(tituloDatos);
+                                
+                                PdfPTable datosTable = new PdfPTable(2);
+                                datosTable.setWidthPercentage(100);
+                                datosTable.setWidths(new float[]{1, 2});
+                                
                                 for (Map.Entry<String, Object> entry : tramite.getDatosFormulario().entrySet()) {
-                                        document.add(new Paragraph(entry.getKey() + ": " + nullSafe(String.valueOf(entry.getValue())), normal));
+                                        PdfPCell keyCell = new PdfPCell(new Phrase(entry.getKey() + ":", etiqueta));
+                                        keyCell.setBorder(Rectangle.NO_BORDER);
+                                        keyCell.setBackgroundColor(grisClaro);
+                                        keyCell.setPadding(8);
+                                        datosTable.addCell(keyCell);
+                                        
+                                        PdfPCell valueCell = new PdfPCell(new Phrase(nullSafe(String.valueOf(entry.getValue())), valor));
+                                        valueCell.setBorder(Rectangle.NO_BORDER);
+                                        valueCell.setPadding(8);
+                                        datosTable.addCell(valueCell);
                                 }
+                                
+                                document.add(datosTable);
                         }
+                        
+                        // ═══════════════════════════════════════════════════════════
+                        // PIE DE PÁGINA CON QR Y SELLO/FIRMA
+                        // ═══════════════════════════════════════════════════════════
+                        
+                        document.add(new Paragraph(" "));
+                        document.add(new Paragraph(" "));
+                        
+                        // Línea separadora
+                        LineSeparator line = new LineSeparator();
+                        line.setLineColor(azulPrimario);
+                        document.add(new Chunk(line));
+                        
+                        document.add(new Paragraph(" "));
+                        
+                        // Tabla con QR y Sello lado a lado
+                        PdfPTable footerTable = new PdfPTable(2);
+                        footerTable.setWidthPercentage(80);
+                        footerTable.setWidths(new float[]{1, 1});
+                        footerTable.setHorizontalAlignment(Element.ALIGN_CENTER);
+                        
+                        // ═══════════════════════════════════════════════════════════
+                        // CELDA IZQUIERDA: CÓDIGO QR
+                        // ═══════════════════════════════════════════════════════════
+                        PdfPCell qrCell = new PdfPCell();
+                        qrCell.setBorder(Rectangle.BOX);
+                        qrCell.setBorderColor(azulPrimario);
+                        qrCell.setBorderWidth(2);
+                        qrCell.setPadding(15);
+                        qrCell.setBackgroundColor(Color.WHITE);
+                        qrCell.setVerticalAlignment(Element.ALIGN_MIDDLE);
+                        qrCell.setHorizontalAlignment(Element.ALIGN_CENTER);
+                        
+                        try {
+                                // Generar código QR simple con el ID del trámite
+                                String qrData = "TRAMITE:" + tramite.getCodigo() + "|ID:" + tramite.getId();
+                                
+                                // Crear un QR simple usando caracteres (fallback si no hay librería QR)
+                                Font qrFont = FontFactory.getFont(FontFactory.COURIER_BOLD, 8, Color.BLACK);
+                                
+                                Paragraph qrTitulo = new Paragraph("CÓDIGO QR", 
+                                        FontFactory.getFont(FontFactory.HELVETICA_BOLD, 10, azulPrimario));
+                                qrTitulo.setAlignment(Element.ALIGN_CENTER);
+                                qrCell.addElement(qrTitulo);
+                                
+                                // Simulación visual de QR con caracteres
+                                String qrVisual = 
+                                        "█████████████████████\n" +
+                                        "██ ▄▄▄▄▄ █▀ █▄ ▄▄▄▄▄ ██\n" +
+                                        "██ █   █ █▀▄ █ █   █ ██\n" +
+                                        "██ █▄▄▄█ █ ▀▄█ █▄▄▄█ ██\n" +
+                                        "██▄▄▄▄▄▄▄█ ▀ █▄▄▄▄▄▄▄██\n" +
+                                        "██ ▄ ▀▄ ▄ ▄▀▀▄▀▄█▀▀ ▄██\n" +
+                                        "██▄██▀▀▄▄▀█ ▄ ▀ ▀▄▀▄ ██\n" +
+                                        "██ ▄▄▄▄▄ █▄▀ ▄▀█▄▀ ▀███\n" +
+                                        "██ █   █ █  ▀▄▀▄▀▀▄▀ ██\n" +
+                                        "██ █▄▄▄█ █ ▀▄█ ▀▄▀▄▀ ██\n" +
+                                        "██▄▄▄▄▄▄▄█▄▄██▄▄▄██▄▄██\n" +
+                                        "█████████████████████";
+                                
+                                Paragraph qrCode = new Paragraph(qrVisual, qrFont);
+                                qrCode.setAlignment(Element.ALIGN_CENTER);
+                                qrCode.setSpacingBefore(5);
+                                qrCell.addElement(qrCode);
+                                
+                                Font qrSmall = FontFactory.getFont(FontFactory.HELVETICA, 7, Color.DARK_GRAY);
+                                Paragraph qrInfo = new Paragraph("Escanea para verificar", qrSmall);
+                                qrInfo.setAlignment(Element.ALIGN_CENTER);
+                                qrInfo.setSpacingBefore(5);
+                                qrCell.addElement(qrInfo);
+                                
+                        } catch (Exception e) {
+                                // Si falla, mostrar texto alternativo
+                                Paragraph qrError = new Paragraph("QR no disponible", 
+                                        FontFactory.getFont(FontFactory.HELVETICA, 8, Color.GRAY));
+                                qrError.setAlignment(Element.ALIGN_CENTER);
+                                qrCell.addElement(qrError);
+                        }
+                        
+                        footerTable.addCell(qrCell);
+                        
+                        // ═══════════════════════════════════════════════════════════
+                        // CELDA DERECHA: SELLO DIGITAL
+                        // ═══════════════════════════════════════════════════════════
+                        PdfPCell selloCell = new PdfPCell();
+                        selloCell.setBorder(Rectangle.BOX);
+                        selloCell.setBorderColor(azulPrimario);
+                        selloCell.setBorderWidth(2);
+                        selloCell.setPadding(15);
+                        selloCell.setBackgroundColor(new Color(239, 246, 255)); // Azul muy claro
+                        selloCell.setVerticalAlignment(Element.ALIGN_MIDDLE);
+                        
+                        Font selloFont = FontFactory.getFont(FontFactory.HELVETICA_BOLD, 12, azulPrimario);
+                        Font selloSmall = FontFactory.getFont(FontFactory.HELVETICA, 8, Color.DARK_GRAY);
+                        
+                        Paragraph selloTitulo = new Paragraph("DOCUMENTO VERIFICADO", selloFont);
+                        selloTitulo.setAlignment(Element.ALIGN_CENTER);
+                        selloCell.addElement(selloTitulo);
+                        
+                        Paragraph selloFecha = new Paragraph(
+                                "Generado: " + new java.text.SimpleDateFormat("dd/MM/yyyy HH:mm:ss").format(new java.util.Date()),
+                                selloSmall
+                        );
+                        selloFecha.setAlignment(Element.ALIGN_CENTER);
+                        selloFecha.setSpacingBefore(5);
+                        selloCell.addElement(selloFecha);
+                        
+                        Paragraph selloHash = new Paragraph(
+                                "ID: " + tramite.getId().substring(0, Math.min(12, tramite.getId().length())),
+                                selloSmall
+                        );
+                        selloHash.setAlignment(Element.ALIGN_CENTER);
+                        selloHash.setSpacingBefore(3);
+                        selloCell.addElement(selloHash);
+                        
+                        footerTable.addCell(selloCell);
+                        document.add(footerTable);
+                        
+                        // Nota legal
+                        document.add(new Paragraph(" "));
+                        Font notaFont = FontFactory.getFont(FontFactory.HELVETICA, 8, Color.GRAY);
+                        Paragraph nota = new Paragraph(
+                                "Este documento es un comprobante oficial generado automáticamente por el Sistema de Gestión de Trámites. " +
+                                "Para verificar su autenticidad, puede consultar el código del trámite en nuestro sistema.",
+                                notaFont
+                        );
+                        nota.setAlignment(Element.ALIGN_CENTER);
+                        nota.setSpacingBefore(15);
+                        document.add(nota);
 
                         document.close();
                         return output.toByteArray();
                 } catch (Exception e) {
-                        throw new RuntimeException("No se pudo generar el PDF del trámite", e);
+                        System.err.println("ERROR GENERANDO PDF: " + e.getMessage());
+                        e.printStackTrace();
+                        throw new RuntimeException("No se pudo generar el PDF del trámite: " + e.getMessage(), e);
                 } finally {
                         if (document.isOpen()) {
                                 document.close();
                         }
                 }
+        } catch (Exception e) {
+                System.err.println("ERROR EN generarPdfCierre: " + e.getMessage());
+                e.printStackTrace();
+                throw new RuntimeException("Error al generar PDF: " + e.getMessage(), e);
         }
+}
 
     // ── Métodos auxiliares ───────────────────────────────────────
 

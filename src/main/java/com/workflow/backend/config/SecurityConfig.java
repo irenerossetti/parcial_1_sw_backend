@@ -6,6 +6,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
+import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
@@ -22,6 +23,7 @@ import java.util.Arrays;
 
 @Configuration
 @EnableWebSecurity
+@EnableMethodSecurity
 public class SecurityConfig {
 
     @Autowired
@@ -29,6 +31,9 @@ public class SecurityConfig {
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
+        System.out.println("=== CONFIGURANDO SECURITY FILTER CHAIN ===");
+        System.out.println("Permitiendo /api/kpis/** para ADMIN y FUNCIONARIO");
+        
         http
                 .csrf(csrf -> csrf.disable())
                 .cors(cors -> cors.configurationSource(corsConfigurationSource()))
@@ -40,11 +45,16 @@ public class SecurityConfig {
                         // Endpoints de trámites
                         .requestMatchers("/api/tramites").hasAnyRole("ADMIN", "FUNCIONARIO", "CLIENTE")
                         .requestMatchers("/api/tramites/mis-tramites").hasAnyRole("ADMIN", "FUNCIONARIO", "CLIENTE")
+                        .requestMatchers("/api/tramites/*/pdf").hasAnyRole("ADMIN", "FUNCIONARIO", "CLIENTE")
                         .requestMatchers("/api/tramites/*/estado-completo").hasAnyRole("ADMIN", "FUNCIONARIO")
                         .requestMatchers("/api/tramites/*/avanzar").hasAnyRole("ADMIN", "FUNCIONARIO")
                         .requestMatchers("/api/tramites/*/rechazar").hasAnyRole("ADMIN", "FUNCIONARIO")
                         // Endpoints de notificaciones
                         .requestMatchers("/api/notificaciones/**").hasAnyRole("ADMIN", "FUNCIONARIO", "CLIENTE")
+                        // Endpoints de KPIs (ADMIN y FUNCIONARIO)
+                        .requestMatchers("/api/kpis/**").hasAnyRole("ADMIN", "FUNCIONARIO")
+                        // Endpoints de KPIs (ADMIN y FUNCIONARIO) - DEBE IR ANTES DE POLITICAS
+                        .requestMatchers("/api/kpis/**").hasAnyRole("ADMIN", "FUNCIONARIO")
                         // Endpoints de politicas
                         .requestMatchers("/api/politicas").hasAnyRole("ADMIN", "FUNCIONARIO", "CLIENTE")
                         .requestMatchers(HttpMethod.POST, "/api/politicas").hasRole("ADMIN")
@@ -55,6 +65,8 @@ public class SecurityConfig {
                         .requestMatchers("/api/departamentos").hasAnyRole("ADMIN", "FUNCIONARIO")
                         // Endpoints de usuarios (solo ADMIN)
                         .requestMatchers("/api/usuarios/**").hasRole("ADMIN")
+                        // Endpoints de formularios (ADMIN y FUNCIONARIO)
+                        .requestMatchers("/api/formularios/**").hasAnyRole("ADMIN", "FUNCIONARIO", "CLIENTE")
                         // Cualquier otra cosa requiere autenticación
                         .anyRequest().authenticated()
                 )
@@ -66,7 +78,8 @@ public class SecurityConfig {
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
-        configuration.setAllowedOrigins(Arrays.asList("http://localhost:4200", "http://localhost:4201", "http://localhost:5000", "http://localhost:61647"));
+        // Usar allowedOriginPatterns en lugar de allowedOrigins para permitir credenciales
+        configuration.setAllowedOriginPatterns(Arrays.asList("*"));
         configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS"));
         configuration.setAllowedHeaders(Arrays.asList("*"));
         configuration.setAllowCredentials(true);

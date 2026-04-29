@@ -1,0 +1,294 @@
+╔═══════════════════════════════════════════════════════════════╗
+║                                                               ║
+║              CHECKLIST PARA LA DEMO                           ║
+║                                                               ║
+║              Imprime esto y márcalo                           ║
+║                                                               ║
+╚═══════════════════════════════════════════════════════════════╝
+
+
+┌───────────────────────────────────────────────────────────────┐
+│  30 MINUTOS ANTES DE LA DEMO                                  │
+└───────────────────────────────────────────────────────────────┘
+
+[ ] Iniciar backend
+    cd backend
+    ./start-backend.bat
+    Esperar: "Started BackendApplication"
+
+[ ] Iniciar frontend
+    cd diagram
+    npm start
+    Esperar: "Compiled successfully"
+
+[ ] Abrir frontend en navegador
+    http://localhost:4200
+
+[ ] Login como admin
+    Email: admin@example.com
+    Password: admin123
+
+[ ] Probar chatbot
+    Clic en botón flotante azul
+    Escribir: "Hola"
+    Verificar respuesta
+
+[ ] Probar plantillas AI
+    Ir a "Plantillas AI" en el menú
+    Buscar: "instalación"
+    Clic en "Buscar con AI"
+    Verificar resultados
+
+[ ] Probar asistente de voz
+    Ir a "Políticas" → Crear/Editar
+    Clic en "Diagrama"
+    Clic en botón de micrófono
+    Permitir acceso al micrófono
+    Decir: "Agregar nodo validación"
+    Verificar que se crea el nodo
+
+[ ] Verificar que hay al menos 1 política creada
+
+[ ] Verificar que hay al menos 1 departamento creado
+
+
+┌───────────────────────────────────────────────────────────────┐
+│  10 MINUTOS ANTES DE LA DEMO                                  │
+└───────────────────────────────────────────────────────────────┘
+
+[ ] Cerrar todas las pestañas innecesarias del navegador
+
+[ ] Cerrar aplicaciones innecesarias
+
+[ ] Desactivar notificaciones del sistema
+    Windows: Win + A → Activar "No molestar"
+    Mac: Centro de notificaciones → Activar "No molestar"
+
+[ ] Aumentar zoom del navegador a 125%
+    Ctrl + (o Cmd +)
+
+[ ] Tener agua cerca
+
+[ ] Ir al baño (en serio)
+
+[ ] Respirar profundo 3 veces
+
+[ ] Sonreír (te ayudará a relajarte)
+
+
+┌───────────────────────────────────────────────────────────────┐
+│  DURANTE LA DEMO - MINUTO 1: CHATBOT AI                      │
+└───────────────────────────────────────────────────────────────┘
+
+[ ] Decir: "Primero, nuestro chatbot AI conversacional"
+
+[ ] Hacer clic en el botón flotante azul
+
+[ ] Decir: "Al iniciar sesión, aparece este botón"
+
+[ ] Escribir en el chat: "¿Cómo creo una política?"
+
+[ ] Decir: "Usa GPT-3.5-turbo de OpenAI vía OpenRouter"
+
+[ ] Esperar respuesta
+
+[ ] Decir: "Como ven, responde de forma natural y contextual"
+
+
+┌───────────────────────────────────────────────────────────────┐
+│  DURANTE LA DEMO - MINUTO 2: PLANTILLAS AI                   │
+└───────────────────────────────────────────────────────────────┘
+
+[ ] Decir: "Segunda funcionalidad: biblioteca de plantillas"
+
+[ ] Ir a "Plantillas AI" en el menú
+
+[ ] Decir: "Tenemos 5 plantillas profesionales predefinidas"
+
+[ ] Escribir en búsqueda: "instalación eléctrica"
+
+[ ] Hacer clic en "Buscar con AI"
+
+[ ] Decir: "La búsqueda usa embeddings de OpenAI"
+
+[ ] Decir: "Entiende el contexto, no solo keywords"
+
+[ ] Hacer clic en "Vista Previa" de la plantilla encontrada
+
+[ ] Hacer clic en "Usar Plantilla"
+
+[ ] Decir: "Crea una política instantáneamente"
+
+
+┌───────────────────────────────────────────────────────────────┐
+│  DURANTE LA DEMO - MINUTO 3: ASISTENTE DE VOZ                │
+└───────────────────────────────────────────────────────────────┘
+
+[ ] Decir: "Tercera funcionalidad: asistente de voz"
+
+[ ] Ir a "Políticas" → Abrir una política
+
+[ ] Hacer clic en "Diagrama"
+
+[ ] Decir: "Aquí tenemos el editor de diagramas"
+
+[ ] Hacer clic en el botón de micrófono flotante
+
+[ ] Decir: "Voy a usar comandos de voz"
+
+[ ] Decir en voz alta: "Agregar nodo validación"
+
+[ ] Esperar a que se cree el nodo
+
+[ ] Decir: "El sistema interpreta el comando con AI"
+
+[ ] Decir: "Y crea el nodo automáticamente"
+
+
+┌───────────────────────────────────────────────────────────────┐
+│  DURANTE LA DEMO - BONUS: APP FLUTTER (SI HAY TIEMPO)        │
+└───────────────────────────────────────────────────────────────┘
+
+[ ] Decir: "También tenemos una app móvil Flutter"
+
+[ ] Mostrar el dispositivo/emulador
+
+[ ] Decir: "Diseño coherente con el frontend web"
+
+[ ] Mostrar la lista de trámites
+
+[ ] Hacer clic en un trámite
+
+[ ] Decir: "Timeline completo del trámite"
+
+[ ] Mostrar el botón de PDF
+
+[ ] Decir: "Integración completa con el backend"
+
+
+┌───────────────────────────────────────────────────────────────┐
+│  DESPUÉS DE LA DEMO - PREGUNTAS                               │
+└───────────────────────────────────────────────────────────────┘
+
+Posibles preguntas y respuestas:
+
+[ ] "¿Qué modelo de AI usan?"
+    → GPT-3.5-turbo de OpenAI vía OpenRouter
+
+[ ] "¿Por qué OpenRouter?"
+    → Más económico que OpenAI directo, misma calidad
+
+[ ] "¿Cómo funciona la búsqueda semántica?"
+    → Usa embeddings de OpenAI para entender contexto
+
+[ ] "¿El asistente de voz funciona en otros idiomas?"
+    → Actualmente español, pero se puede extender
+
+[ ] "¿La app móvil funciona offline?"
+    → No, requiere conexión para sincronizar con backend
+
+[ ] "¿Qué tecnologías usaron?"
+    → Backend: Spring Boot + MongoDB
+    → Frontend: Angular 21 + GoJS
+    → Móvil: Flutter
+    → AI: OpenRouter API
+
+
+┌───────────────────────────────────────────────────────────────┐
+│  PLAN B - SI ALGO FALLA                                       │
+└───────────────────────────────────────────────────────────────┘
+
+Si el chatbot no responde:
+[ ] Mantener la calma
+[ ] Decir: "Déjenme mostrarles el código"
+[ ] Abrir: diagram/src/app/core/services/openai.service.ts
+[ ] Explicar la arquitectura
+[ ] Decir: "La funcionalidad está implementada"
+
+Si la búsqueda AI falla:
+[ ] Usar búsqueda normal de texto
+[ ] Decir: "Tenemos fallback automático"
+[ ] Mostrar las plantillas manualmente
+
+Si el asistente de voz falla:
+[ ] Crear nodos manualmente
+[ ] Decir: "Déjenme mostrarles el flujo técnico"
+[ ] Abrir: diagram/src/app/components/voice-assistant/
+[ ] Explicar el código
+
+Si Flutter no conecta:
+[ ] Mostrar el código de la app
+[ ] Explicar la integración
+[ ] Mostrar capturas de pantalla
+
+
+┌───────────────────────────────────────────────────────────────┐
+│  PUNTOS CLAVE A MENCIONAR                                     │
+└───────────────────────────────────────────────────────────────┘
+
+[ ] "100% de requisitos cumplidos"
+
+[ ] "3 funcionalidades AI reales, no simuladas"
+
+[ ] "Búsqueda semántica real con embeddings"
+
+[ ] "Interpretación inteligente de comandos"
+
+[ ] "App móvil completa con Flutter"
+
+[ ] "15,500+ líneas de código"
+
+[ ] "Arquitectura escalable y mantenible"
+
+[ ] "Diseño moderno y profesional"
+
+
+┌───────────────────────────────────────────────────────────────┐
+│  DESPUÉS DE LA DEMO                                           │
+└───────────────────────────────────────────────────────────────┘
+
+[ ] Agradecer a la audiencia
+
+[ ] Responder preguntas adicionales
+
+[ ] Cerrar backend y frontend
+
+[ ] Guardar cambios si es necesario
+
+[ ] Celebrar 🎉
+
+
+┌───────────────────────────────────────────────────────────────┐
+│  RECORDATORIOS IMPORTANTES                                    │
+└───────────────────────────────────────────────────────────────┘
+
+✓ Hablar claro y pausado
+✓ Explicar qué estás haciendo
+✓ Mantener contacto visual con la audiencia
+✓ Sonreír y mostrar confianza
+✓ Si algo falla, mantener la calma
+✓ Tener agua cerca
+✓ Respirar profundo antes de empezar
+
+
+╔═══════════════════════════════════════════════════════════════╗
+║                                                               ║
+║              ¡CONFÍA EN TU TRABAJO!                           ║
+║                                                               ║
+║         Has hecho un excelente proyecto                       ║
+║                                                               ║
+║              ¡ÉXITO EN TU DEMO! 🚀                            ║
+║                                                               ║
+╚═══════════════════════════════════════════════════════════════╝
+
+
+NOTAS PERSONALES:
+_________________________________________________________________
+
+_________________________________________________________________
+
+_________________________________________________________________
+
+_________________________________________________________________
+
+_________________________________________________________________

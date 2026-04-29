@@ -106,43 +106,66 @@ public class TramiteController {
 
     @GetMapping("/{id}/pdf")
     public ResponseEntity<?> descargarPdfTramite(@PathVariable String id) {
+        System.out.println("=== INICIO DESCARGA PDF ===");
+        System.out.println("ID del trámite: " + id);
+        
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         String email = auth.getName();
+        System.out.println("Usuario autenticado: " + email);
 
         Optional<Usuario> usuarioOpt = usuarioRepository.findByEmail(email);
         if (usuarioOpt.isEmpty()) {
+            System.err.println("ERROR: Usuario no encontrado");
             return ResponseEntity.status(401).build();
         }
 
         Optional<Tramite> tramiteOpt = tramiteService.obtenerPorId(id);
         if (tramiteOpt.isEmpty()) {
+            System.err.println("ERROR: Trámite no encontrado");
             return ResponseEntity.notFound().build();
         }
 
         Usuario usuario = usuarioOpt.get();
         Tramite tramite = tramiteOpt.get();
+        
+        System.out.println("Trámite encontrado: " + tramite.getCodigo());
+        System.out.println("Estado del trámite: " + tramite.getEstado());
 
         boolean puedeVer = puedeVerTramite(usuario, tramite);
 
         if (!puedeVer) {
+            System.err.println("ERROR: Usuario no tiene permisos");
             Map<String, String> error = new HashMap<>();
             error.put("mensaje", "No autorizado para descargar el PDF de este trámite");
             return ResponseEntity.status(HttpStatus.FORBIDDEN).body(error);
         }
 
         try {
+            System.out.println("Generando PDF...");
+            // CAMBIO: Llamar al método sin validación de estado
             byte[] pdf = tramiteService.generarPdfCierre(id);
+            System.out.println("PDF generado exitosamente. Tamaño: " + pdf.length + " bytes");
+            
             String fileName = (tramite.getCodigo() != null && !tramite.getCodigo().isBlank())
                     ? "tramite-" + tramite.getCodigo() + ".pdf"
                     : "tramite-" + id + ".pdf";
 
+            System.out.println("Enviando PDF: " + fileName);
             return ResponseEntity.ok()
                     .contentType(MediaType.APPLICATION_PDF)
                     .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + fileName + "\"")
                     .body(pdf);
         } catch (RuntimeException e) {
+            // Log del error para debugging
+            System.err.println("=== ERROR AL GENERAR PDF ===");
+            System.err.println("Mensaje: " + e.getMessage());
+            System.err.println("Causa: " + (e.getCause() != null ? e.getCause().getMessage() : "N/A"));
+            e.printStackTrace();
+            
             Map<String, String> error = new HashMap<>();
             error.put("mensaje", e.getMessage());
+            error.put("tipo", "ERROR_PDF");
+            error.put("causa", e.getCause() != null ? e.getCause().getMessage() : "Desconocida");
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(error);
         }
     }

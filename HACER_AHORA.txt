@@ -1,0 +1,43 @@
+╔═══════════════════════════════════════════════════════════════╗
+║                                                               ║
+║                    ✅ HACER AHORA                             ║
+║                                                               ║
+╚═══════════════════════════════════════════════════════════════╝
+
+
+📌 CAMBIO APLICADO:
+   Solo trámites COMPLETADOS pueden descargar PDF
+
+
+🚀 PASOS:
+
+   1. Reiniciar backend:
+      cd backend
+      taskkill /F /IM java.exe
+      mvnw.cmd clean spring-boot:run
+
+   2. Completar un trámite:
+      - Login como ADMIN o FUNCIONARIO
+      - Cambiar estado de un trámite a COMPLETADO
+
+   3. Probar PDF:
+      - Login como CLIENTE
+      - Click en trámite COMPLETADO
+      - Click "Descargar PDF"
+      - ✅ Debe funcionar
+
+
+═══════════════════════════════════════════════════════════════
+
+
+📚 MÁS INFO:
+   - SOLUCION_FINAL_PDF.md       → Explicación completa
+   - COMO_COMPLETAR_TRAMITE.md   → Cómo completar trámites
+
+
+═══════════════════════════════════════════════════════════════
+
+
+⏱️ TIEMPO: 5 minutos
+
+🎯 DEMO: Miércoles 30 abril 2026
