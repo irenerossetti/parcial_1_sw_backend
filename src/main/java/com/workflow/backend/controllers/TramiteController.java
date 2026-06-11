@@ -21,7 +21,6 @@ import java.util.Optional;
 
 @RestController
 @RequestMapping("/api/tramites")
-@CrossOrigin(origins = "http://localhost:4200")
 public class TramiteController {
 
     @Autowired

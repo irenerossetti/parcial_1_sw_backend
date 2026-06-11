@@ -13,7 +13,6 @@ import java.util.Optional;
 
 @RestController
 @RequestMapping("/api/politicas")
-@CrossOrigin(origins = {"http://localhost:4200", "http://localhost:4201", "http://localhost:5000", "http://localhost:61647"})
 public class PoliticaFormularioController {
 
     @Autowired

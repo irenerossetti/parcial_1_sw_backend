@@ -11,7 +11,6 @@ import java.util.List;
 @RestController
 @RequestMapping("/api/politicas")
 @RequiredArgsConstructor
-@CrossOrigin(origins = "http://localhost:4200")
 public class PoliticaNegocioController {
 
     private final PoliticaNegocioService politicaService;
